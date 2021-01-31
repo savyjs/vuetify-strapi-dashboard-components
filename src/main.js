@@ -1,16 +1,39 @@
-// Import vue component
-import component from './my-component.vue';
+import * as components from "./components/index";
+import JsonExcel from "vue-json-excel";
+import Helper from './assets/helper'
 
-// Declare install function executed by Vue.use()
-export function install(Vue) {
-  if (install.installed) return;
-  install.installed = true;
-  Vue.component('MyComponent', component);
+// const moduleOptions = <%= JSON.stringify(options) %>;
+// const mixins = require(`${moduleOptions.scheme}`).default || [];
+
+const ComponentLibrary = {
+  install(Vue, options = {}) {
+    if (install.installed) return;
+    // console.log(2, {options})
+    try {
+      Vue.component("downloadExcel", JsonExcel);
+      Vue.set(Vue.prototype, 'Helper', Helper);
+      Vue.set(Vue.prototype, '$Helper', Helper);
+      // Vue.set(Vue.prototype, '$Helper', Helper);
+      for (const componentName in components.default) {
+        let component = components.default[componentName]
+        // console.log({component, componentName})
+        try {
+          Vue.component(componentName, component);
+        } catch (e) {
+          console.error({componentName, e})
+        }
+      }
+      install.installed = true;
+    } catch (e) {
+      console.error({e})
+    }
+  }
 }
+
 
 // Create module definition for Vue.use()
 const plugin = {
-  install,
+  install: ComponentLibrary.install,
 };
 
 // Auto-install when vue is found (eg. in browser via <script> tag)
@@ -24,5 +47,8 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 }
 
-// To allow use as module (npm/webpack/etc.) export component
-export default component;
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(ComponentLibrary)
+}
+
+export default ComponentLibrary;

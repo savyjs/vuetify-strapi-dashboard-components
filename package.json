@@ -2,7 +2,7 @@
   "name": "vsd-components",
   "version": "0.0.5",
   "description": "Vuetify Strapi Dashboard Components",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
